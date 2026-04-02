@@ -1,4 +1,4 @@
-const API_BASE = 'https://quantitymeasurementapp-production.up.railway.app';
+const API_BASE = 'quantitymeasurementapp-production.up.railway.app';
 
 const loginTab   = document.getElementById('loginTab');
 const signupTab  = document.getElementById('signupTab');
