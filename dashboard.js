@@ -1,4 +1,4 @@
-const API_BASE = 'quantitymeasurementapp-production.up.railway.app';
+const API_BASE = window.QM_API_BASE || 'http://localhost:8080';
 
 const token = localStorage.getItem('token');
 if (!token) {
@@ -116,7 +116,7 @@ document.getElementById('convertBtn').addEventListener('click', async () => {
   if (isNaN(value)) return showResult('Enter a valid number', true);
   showResult('Loading...');
   try {
-    const res = await apiFetch('POST', `/api/quantity/convert?targetUnit=${targetUnit}`, {
+    const res = await apiFetch('POST', `/quantity/convert?targetUnit=${targetUnit}`, {
       value, unit, measurementType: unitMaps[currentType].type
     });
     if (res.ok) {
@@ -138,7 +138,7 @@ document.getElementById('compareBtn').addEventListener('click', async () => {
   if (isNaN(q1.value) || isNaN(q2.value)) return showResult('Enter valid numbers', true);
   showResult('Loading...');
   try {
-    const res = await apiFetch('POST', '/api/quantity/compare', { thisQuantity: q1, thatQuantity: q2 });
+    const res = await apiFetch('POST', '/quantity/compare', { thisQuantity: q1, thatQuantity: q2 });
     if (res.ok) {
       showResult((await res.json()) ? 'Equal ✓' : 'Not Equal ✗');
     } else {
@@ -156,7 +156,7 @@ document.getElementById('addBtn').addEventListener('click', async () => {
   if (isNaN(q1.value) || isNaN(q2.value)) return showResult('Enter valid numbers', true);
   showResult('Loading...');
   try {
-    const res = await apiFetch('POST', '/api/quantity/add', { thisQuantity: q1, thatQuantity: q2 });
+    const res = await apiFetch('POST', '/quantity/add', { thisQuantity: q1, thatQuantity: q2 });
     if (res.ok) {
       const data = await res.json();
       showResult(`${data.value} ${data.unit}`);
@@ -175,7 +175,7 @@ document.getElementById('subtractBtn').addEventListener('click', async () => {
   if (isNaN(q1.value) || isNaN(q2.value)) return showResult('Enter valid numbers', true);
   showResult('Loading...');
   try {
-    const res = await apiFetch('POST', '/api/quantity/subtract', { thisQuantity: q1, thatQuantity: q2 });
+    const res = await apiFetch('POST', '/quantity/subtract', { thisQuantity: q1, thatQuantity: q2 });
     if (res.ok) {
       const data = await res.json();
       showResult(`${data.value} ${data.unit}`);
@@ -194,7 +194,7 @@ document.getElementById('divideBtn').addEventListener('click', async () => {
   if (isNaN(q1.value) || isNaN(q2.value)) return showResult('Enter valid numbers', true);
   showResult('Loading...');
   try {
-    const res = await apiFetch('POST', '/api/quantity/divide', { thisQuantity: q1, thatQuantity: q2 });
+    const res = await apiFetch('POST', '/quantity/divide', { thisQuantity: q1, thatQuantity: q2 });
     if (res.ok) {
       showResult(`Result: ${await res.json()}`);
     } else {
@@ -214,7 +214,7 @@ document.getElementById('historyBtn').addEventListener('click', async () => {
   if (!open) return;
   historyList.innerHTML = '<li class="hist-loading">Loading...</li>';
   try {
-    const res = await apiFetch('GET', '/api/quantity/history');
+    const res = await apiFetch('GET', '/quantity/history');
     if (!res.ok) { historyList.innerHTML = '<li class="hist-empty">Failed to load history.</li>'; return; }
     const data = await res.json();
     if (!data.length) { historyList.innerHTML = '<li class="hist-empty">No history yet.</li>'; return; }

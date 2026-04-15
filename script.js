@@ -1,4 +1,4 @@
-const API_BASE = 'quantitymeasurementapp-production.up.railway.app';
+const API_BASE = window.QM_API_BASE || 'http://localhost:8080';
 
 const loginTab   = document.getElementById('loginTab');
 const signupTab  = document.getElementById('signupTab');
@@ -21,30 +21,42 @@ function showError(id, msg) {
 
 async function setLoading(btn, loading) {
   btn.disabled = loading;
-  btn.innerHTML = loading ? '<span class="spinner"></span> Loading...' : btn.dataset.originalText || btn.innerHTML;
+  btn.innerHTML = loading 
+    ? '<span class="spinner"></span> Loading...' 
+    : btn.dataset.originalText || btn.innerHTML;
 }
 
 async function handleLogin() {
   const btn = document.getElementById('loginButton');
   if (!btn.dataset.originalText) btn.dataset.originalText = btn.innerHTML;
+
   showError('loginError', '');
+
   const email    = document.getElementById('loginEmail').value.trim();
   const password = document.getElementById('loginPassword').value;
-  if (!email || !password) return showError('loginError', 'Please fill all fields');
+
+  if (!email || !password) {
+    return showError('loginError', 'Please fill all fields');
+  }
+
   setLoading(btn, true);
+
   try {
     const res = await fetch(`${API_BASE}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
     });
+
     const data = await res.json();
+
     if (res.ok) {
-      localStorage.setItem('token', data.token);
-      window.location.href = 'index.html';
+      localStorage.setItem('token', data.accessToken);
+      window.location.href = 'dashboard.html';
     } else {
-      showError('loginError', data.message || 'Login failed');
+      showError('loginError', data.message || data.error || 'Login failed');
     }
+
   } catch (e) {
     showError('loginError', 'Network error: ' + e.message);
   } finally {
@@ -55,25 +67,35 @@ async function handleLogin() {
 async function handleSignup() {
   const btn = document.getElementById('signupButton');
   if (!btn.dataset.originalText) btn.dataset.originalText = btn.innerHTML;
+
   showError('signupError', '');
+
   const name     = document.getElementById('fullName').value.trim();
   const email    = document.getElementById('signupEmail').value.trim();
   const password = document.getElementById('signupPassword').value;
-  if (!name || !email || !password) return showError('signupError', 'Please fill all fields');
+
+  if (!name || !email || !password) {
+    return showError('signupError', 'Please fill all fields');
+  }
+
   setLoading(btn, true);
+
   try {
     const res = await fetch(`${API_BASE}/api/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, password })
     });
+
     const data = await res.json();
+
     if (res.ok) {
-      localStorage.setItem('token', data.token);
-      window.location.href = 'index.html';
+      localStorage.setItem('token', data.accessToken);
+      window.location.href = 'dashboard.html';
     } else {
-      showError('signupError', data.message || 'Registration failed');
+      showError('signupError', data.message || data.error || 'Registration failed');
     }
+
   } catch (e) {
     showError('signupError', 'Network error: ' + e.message);
   } finally {
@@ -92,5 +114,4 @@ document.querySelectorAll('.toggle-password').forEach(toggle => {
   });
 });
 
-// Init — show login tab active
 setActiveTab(true);
