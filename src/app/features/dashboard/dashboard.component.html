@@ -1,0 +1,226 @@
+<div class="qm-app">
+  <header class="qm-header">
+    <div class="qm-logo">QuantityMeasurementApp</div>
+    <div class="qm-header-actions">
+      <button class="qm-history-btn" (click)="toggleHistory()">History</button>
+      <button class="qm-logout-btn" (click)="logout()">Logout</button>
+    </div>
+  </header>
+
+  <!-- History Panel -->
+  <div class="qm-history-panel" [class.is-open]="historyOpen">
+    <div class="qm-history-header">
+      <h3>Operation History</h3>
+      <button (click)="historyOpen = false">✕</button>
+    </div>
+    <ul class="qm-history-list">
+      <li *ngIf="historyLoading" class="hist-empty">Loading...</li>
+      <li *ngIf="historyError" class="hist-empty">{{ historyError }}</li>
+      <li *ngIf="!historyLoading && !historyError && historyItems.length === 0" class="hist-empty">No history yet.</li>
+      <li *ngFor="let item of historyItems" class="hist-item">
+        <span class="hist-op">{{ item.operation }}</span>
+        <span class="hist-detail">
+          {{ item.thisValue }} {{ item.thisUnit }}
+          <ng-container *ngIf="item.thatUnit"> &amp; {{ item.thatValue }} {{ item.thatUnit }}</ng-container>
+          → <strong>{{ item.resultString }}</strong>
+        </span>
+        <span class="hist-time">{{ item.createdAt | date:'medium' }}</span>
+      </li>
+    </ul>
+  </div>
+
+  <main class="qm-main">
+    <section class="qm-hero">
+      <h1>Welcome To Quantity Measurement</h1>
+    </section>
+
+    <section class="qm-content">
+      <!-- Type Selector -->
+      <div class="qm-type-section">
+        <h2 class="qm-section-title">Choose Type</h2>
+        <div class="qm-type-cards">
+          <button *ngFor="let cat of typeCategories"
+                  class="qm-type-card"
+                  [class.is-active]="currentType === cat"
+                  (click)="setType(cat)" type="button">
+            <span class="qm-type-label">{{ labelFor(cat) }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Operation Tabs -->
+      <div class="qm-op-tabs">
+        <h2 class="qm-section-title">Choose Operation</h2>
+        <div class="qm-tab-buttons">
+          <button *ngFor="let op of operations"
+                  class="qm-op-tab"
+                  [class.is-active]="currentOp === op"
+                  (click)="setOp(op)">{{ labelForOp(op) }}</button>
+        </div>
+      </div>
+
+      <!-- Operations Area -->
+      <div id="operations-area">
+
+        <!-- Convert -->
+        <div *ngIf="currentOp === 'convert'" class="op-section is-active">
+          <div class="qm-conversion-section">
+            <div class="qm-card qm-from">
+              <span class="qm-card-label">From</span>
+              <div class="qm-current-unit">{{ convertFromUnit }}</div>
+              <div class="qm-input-row">
+                <input type="number" class="qm-number-input" [(ngModel)]="convertFromValue"/>
+                <div class="qm-select-wrapper">
+                  <select class="qm-select" [(ngModel)]="convertFromUnit">
+                    <option *ngFor="let u of currentUnits" [value]="u">{{ u }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="qm-card qm-to">
+              <span class="qm-card-label">To</span>
+              <div class="qm-current-unit">{{ convertToUnit }}</div>
+              <div class="qm-input-row">
+                <input type="number" class="qm-number-input" [value]="convertToValue ?? ''" readonly/>
+                <div class="qm-select-wrapper">
+                  <select class="qm-select" [(ngModel)]="convertToUnit">
+                    <option *ngFor="let u of currentUnits" [value]="u">{{ u }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="qm-op-btn" (click)="doConvert()">Convert</button>
+        </div>
+
+        <!-- Compare -->
+        <div *ngIf="currentOp === 'compare'" class="op-section is-active">
+          <div class="qm-conversion-section">
+            <div class="qm-card qm-from">
+              <span class="qm-card-label">Quantity 1</span>
+              <div class="qm-current-unit">{{ q1Unit }}</div>
+              <div class="qm-input-row">
+                <input type="number" class="qm-number-input" [(ngModel)]="q1Value"/>
+                <div class="qm-select-wrapper">
+                  <select class="qm-select" [(ngModel)]="q1Unit">
+                    <option *ngFor="let u of currentUnits" [value]="u">{{ u }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="qm-card qm-to">
+              <span class="qm-card-label">Quantity 2</span>
+              <div class="qm-current-unit">{{ q2Unit }}</div>
+              <div class="qm-input-row">
+                <input type="number" class="qm-number-input" [(ngModel)]="q2Value"/>
+                <div class="qm-select-wrapper">
+                  <select class="qm-select" [(ngModel)]="q2Unit">
+                    <option *ngFor="let u of currentUnits" [value]="u">{{ u }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="qm-op-btn" (click)="doCompare()">Compare</button>
+        </div>
+
+        <!-- Add -->
+        <div *ngIf="currentOp === 'add'" class="op-section is-active">
+          <div class="qm-conversion-section">
+            <div class="qm-card qm-from">
+              <span class="qm-card-label">Quantity 1</span>
+              <div class="qm-current-unit">{{ addQ1Unit }}</div>
+              <div class="qm-input-row">
+                <input type="number" class="qm-number-input" [(ngModel)]="addQ1Value"/>
+                <div class="qm-select-wrapper">
+                  <select class="qm-select" [(ngModel)]="addQ1Unit">
+                    <option *ngFor="let u of currentUnits" [value]="u">{{ u }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="qm-card qm-to">
+              <span class="qm-card-label">Quantity 2</span>
+              <div class="qm-current-unit">{{ addQ2Unit }}</div>
+              <div class="qm-input-row">
+                <input type="number" class="qm-number-input" [(ngModel)]="addQ2Value"/>
+                <div class="qm-select-wrapper">
+                  <select class="qm-select" [(ngModel)]="addQ2Unit">
+                    <option *ngFor="let u of currentUnits" [value]="u">{{ u }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="qm-op-btn" (click)="doAdd()">Add</button>
+        </div>
+
+        <!-- Subtract -->
+        <div *ngIf="currentOp === 'subtract'" class="op-section is-active">
+          <div class="qm-conversion-section">
+            <div class="qm-card qm-from">
+              <span class="qm-card-label">Quantity 1</span>
+              <div class="qm-current-unit">{{ subQ1Unit }}</div>
+              <div class="qm-input-row">
+                <input type="number" class="qm-number-input" [(ngModel)]="subQ1Value"/>
+                <div class="qm-select-wrapper">
+                  <select class="qm-select" [(ngModel)]="subQ1Unit">
+                    <option *ngFor="let u of currentUnits" [value]="u">{{ u }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="qm-card qm-to">
+              <span class="qm-card-label">Quantity 2</span>
+              <div class="qm-current-unit">{{ subQ2Unit }}</div>
+              <div class="qm-input-row">
+                <input type="number" class="qm-number-input" [(ngModel)]="subQ2Value"/>
+                <div class="qm-select-wrapper">
+                  <select class="qm-select" [(ngModel)]="subQ2Unit">
+                    <option *ngFor="let u of currentUnits" [value]="u">{{ u }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="qm-op-btn" (click)="doSubtract()">Subtract</button>
+        </div>
+
+        <!-- Divide -->
+        <div *ngIf="currentOp === 'divide'" class="op-section is-active">
+          <div class="qm-conversion-section">
+            <div class="qm-card qm-from">
+              <span class="qm-card-label">Quantity 1</span>
+              <div class="qm-current-unit">{{ divQ1Unit }}</div>
+              <div class="qm-input-row">
+                <input type="number" class="qm-number-input" [(ngModel)]="divQ1Value"/>
+                <div class="qm-select-wrapper">
+                  <select class="qm-select" [(ngModel)]="divQ1Unit">
+                    <option *ngFor="let u of currentUnits" [value]="u">{{ u }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="qm-card qm-to">
+              <span class="qm-card-label">Quantity 2</span>
+              <div class="qm-current-unit">{{ divQ2Unit }}</div>
+              <div class="qm-input-row">
+                <input type="number" class="qm-number-input" [(ngModel)]="divQ2Value"/>
+                <div class="qm-select-wrapper">
+                  <select class="qm-select" [(ngModel)]="divQ2Unit">
+                    <option *ngFor="let u of currentUnits" [value]="u">{{ u }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button class="qm-op-btn" (click)="doDivide()">Divide</button>
+        </div>
+
+      </div>
+
+      <!-- Result -->
+      <div *ngIf="result" class="qm-result" [class.error]="resultError">{{ result }}</div>
+    </section>
+  </main>
+</div>

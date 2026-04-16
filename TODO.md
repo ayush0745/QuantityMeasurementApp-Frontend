@@ -1,5 +1,11 @@
-# Quantity Measurement Frontend: Update Backend URL to Production
+# Fix Angular Compilation Errors - ng serve
 
-## Steps:
+## Plan Steps:
 
-- [x] 1. Create this TODO.md to track progress\n- [x] 2. Edit script.js: Replace localhost API_BASE with production URL\n- [x] 3. Edit dashboard.js: Replace localhost API_BASE with production URL\n- [x] 4. Test the changes (login, conversions, etc.)\n- [ ] 5. Complete task
+- [x] Switch Node.js to v20.x LTS (user confirmed working)
+- [x] 1. Add ARIADirectives import to auth.component.ts
+- [ ] 2. Verify ng serve compiles without errors
+- [ ] 3. Test app functionality (login/signup tabs work)
+- [ ] 4. attempt_completion
+
+Current status: Ready to fix auth.component.ts
