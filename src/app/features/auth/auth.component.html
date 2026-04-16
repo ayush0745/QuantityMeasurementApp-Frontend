@@ -1,0 +1,192 @@
+<div class="auth-wrapper">
+  <div class="auth-illustration">
+    <div class="auth-illustration-inner">
+      <svg viewBox="0 0 120 80" class="ruler-icon" width="80" height="60">
+        <rect x="10" y="10" width="100" height="8" rx="4" fill="#667eea" />
+        <rect x="10" y="24" width="60" height="6" rx="3" fill="#764ba2" />
+        <rect x="75" y="24" width="35" height="6" rx="3" fill="#667eea" />
+        <line
+          x1="20"
+          y1="5"
+          x2="20"
+          y2="15"
+          stroke="#4a5568"
+          stroke-width="2"
+        />
+        <line
+          x1="35"
+          y1="5"
+          x2="35"
+          y2="15"
+          stroke="#4a5568"
+          stroke-width="2"
+        />
+        <line
+          x1="50"
+          y1="5"
+          x2="50"
+          y2="15"
+          stroke="#4a5568"
+          stroke-width="3"
+        />
+        <line
+          x1="65"
+          y1="5"
+          x2="65"
+          y2="15"
+          stroke="#4a5568"
+          stroke-width="2"
+        />
+        <line
+          x1="80"
+          y1="19"
+          x2="80"
+          y2="29"
+          stroke="#4a5568"
+          stroke-width="2"
+        />
+        <line
+          x1="95"
+          y1="19"
+          x2="95"
+          y2="29"
+          stroke="#4a5568"
+          stroke-width="3"
+        />
+        <line
+          x1="110"
+          y1="19"
+          x2="110"
+          y2="29"
+          stroke="#4a5568"
+          stroke-width="2"
+        />
+      </svg>
+      <h2>QuantityMeasurementApp</h2>
+      <p class="tagline">Precise Conversions, Made Simple</p>
+    </div>
+  </div>
+
+  <div class="auth-form-container">
+    <div class="tabs">
+      <div
+        class="tab"
+        [class.active]="activeTab === 'login'"
+        role="tab"
+        tabindex="0"
+        (click)="setTab('login')"
+        (keyup.enter)="setTab('login')"
+        [attr.aria-selected]="activeTab === 'login'"
+      >
+        LOGIN
+      </div>
+      <div
+        class="tab"
+        [class.active]="activeTab === 'signup'"
+        role="tab"
+        tabindex="0"
+        (click)="setTab('signup')"
+        (keyup.enter)="setTab('signup')"
+        [attr.aria-selected]="activeTab === 'signup'"
+      >
+        SIGNUP
+      </div>
+    </div>
+
+    <div class="forms-area">
+      <!-- Login Form -->
+      <form
+        *ngIf="activeTab === 'login'"
+        class="form-panel is-active"
+        (ngSubmit)="handleLogin()"
+      >
+        <div class="field">
+          <label for="loginEmail">Email</label>
+          <input
+            type="email"
+            id="loginEmail"
+            placeholder="Enter email"
+            [(ngModel)]="loginEmail"
+            name="loginEmail"
+          />
+        </div>
+        <div class="field">
+          <label for="loginPassword">Password</label>
+          <div class="input-wrapper">
+            <input
+              [type]="loginShowPassword ? 'text' : 'password'"
+              id="loginPassword"
+              placeholder="Enter password"
+              [(ngModel)]="loginPassword"
+              name="loginPassword"
+            />
+            <span
+              class="toggle-password"
+              (click)="loginShowPassword = !loginShowPassword"
+              title="Show/Hide"
+            >
+              {{ loginShowPassword ? "🙈" : "👁" }}
+            </span>
+          </div>
+        </div>
+        <div class="error-msg">{{ loginError }}</div>
+        <button type="submit" class="primary-btn" [disabled]="loginLoading">
+          <span *ngIf="loginLoading" class="spinner"></span>
+          {{ loginLoading ? "Logging in..." : "Login" }}
+        </button>
+      </form>
+
+      <!-- Signup Form -->
+      <form
+        *ngIf="activeTab === 'signup'"
+        class="form-panel is-active"
+        (ngSubmit)="handleSignup()"
+      >
+        <div class="field">
+          <label for="fullName">Full Name</label>
+          <input
+            type="text"
+            id="fullName"
+            placeholder="Enter full name"
+            [(ngModel)]="signupName"
+            name="fullName"
+          />
+        </div>
+        <div class="field">
+          <label for="signupEmail">Email</label>
+          <input
+            type="email"
+            id="signupEmail"
+            placeholder="Enter email"
+            [(ngModel)]="signupEmail"
+            name="signupEmail"
+          />
+        </div>
+        <div class="field">
+          <label for="signupPassword">Password</label>
+          <div class="input-wrapper">
+            <input
+              [type]="signupShowPassword ? 'text' : 'password'"
+              id="signupPassword"
+              placeholder="Min 8 chars, upper, lower, number, special"
+              [(ngModel)]="signupPassword"
+              name="signupPassword"
+            />
+            <span
+              class="toggle-password"
+              (click)="signupShowPassword = !signupShowPassword"
+              title="Show/Hide"
+            >
+              {{ signupShowPassword ? "🙈" : "👁" }}
+            </span>
+          </div>
+        </div>
+        <div class="error-msg">{{ signupError }}</div>
+        <button type="submit" class="primary-btn" [disabled]="signupLoading">
+          <span *ngIf="signupLoading" class="spinner"></span>
+          {{ signupLoading ? "Signing up..." : "Signup" }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
