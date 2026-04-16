@@ -7,6 +7,11 @@ export interface Quantity {
   unit: string;
   measurementType: MeasurementType;
 }
+export interface HistoryItem {
+  operation: string;
+  result: string;
+  createdAt: string;
+}
 
 export interface ConvertResponse {
   value: number;

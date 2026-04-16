@@ -142,6 +142,7 @@ export class DashboardComponent implements OnInit {
   loadHistory() {
     this.historyLoading = true;
     this.historyError = '';
+    console.log(this.qSvc.getHistory);
     this.qSvc.getHistory().subscribe({
       next: data => { this.historyItems = data; this.historyLoading = false; },
       error: () => { this.historyError = 'Failed to load history.'; this.historyLoading = false; }
